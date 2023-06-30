@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { FaCopy, FaRedo } from "react-icons/fa";
 
 function App() {
   const [password, setPassword] = useState("");
   const [includeUppercase, setIncludeUppercase] = useState(false);
   const [includeSpecialChars, setIncludeSpecialChars] = useState(false);
   const [length, setLength] = useState(10);
+  const [numPasswords, setNumPasswords] = useState(1);
 
   const fetchPassword = () => {
     let url = `http://localhost:8000/api/password/${length}?`;
@@ -17,6 +19,8 @@ function App() {
       url += "includeSpecialChars=true&";
     }
 
+    url += `numPasswords=${numPasswords}&`;
+
     fetch(url)
       .then((response) => response.text())
       .then((data) => setPassword(data))
@@ -28,6 +32,33 @@ function App() {
     if (newLength >= 5 && newLength <= 15) {
       setLength(newLength);
     }
+  };
+
+  const handleNumPasswordsChange = (e) => {
+    const newNum = parseInt(e.target.value);
+    if (newNum >= 1 && newNum <= 10) {
+      setNumPasswords(newNum);
+    }
+  };
+
+  const selectText = (event) => {
+    const element = event.target;
+    if (window.getSelection) {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else if (document.body.createTextRange) {
+      // IE <=8
+      const range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    }
+  };
+
+  const copyToClipboard = (pwd) => {
+    navigator.clipboard.writeText(pwd);
   };
 
   return (
@@ -60,9 +91,12 @@ function App() {
               Inclure des caractères spéciaux
             </span>
           </label>
-{/* 
+
           <div className="flex items-center mb-4">
-            <label htmlFor="numPasswords" className="text-lg text-gray-700 mr-2">
+            <label
+              htmlFor="numPasswords"
+              className="text-lg text-gray-700 mr-2"
+            >
               Nombre de mots de passe :
             </label>
             <select
@@ -82,7 +116,7 @@ function App() {
               <option value="9">9</option>
               <option value="10">10</option>
             </select>
-          </div> */}
+          </div>
 
           <div className="flex items-center mb-4">
             <label htmlFor="length" className="text-lg text-gray-700 mr-2">
@@ -107,6 +141,7 @@ function App() {
               <option value="15">15</option>
             </select>
           </div>
+
           <div className="flex flex-col justify-center items-center">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-lg text-white font-bold py-2 px-4 rounded w-60 sm:w-auto"
@@ -116,9 +151,29 @@ function App() {
             </button>
 
             {password && (
-              <p className="text-2xl bg-gray-200 px-4 py-2 rounded-lg mt-4 w-60 sm:w-auto">
-                {password}
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-center mt-4">
+                {password.split("\n").map((pwd, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-2 bg-gray-200 p-4 rounded-lg shadow-md"
+                  >
+                    <p
+                      className="text-2xl text-center flex-grow"
+                      onClick={selectText}
+                    >
+                      {pwd}
+                    </p>
+                    <FaCopy
+                      onClick={() => copyToClipboard(pwd)}
+                      className="cursor-pointer text-blue-500 hover:text-blue-700 text-2xl mt-1"
+                    />
+                    <FaRedo
+                      onClick={fetchPassword}
+                      className="cursor-pointer text-blue-500 hover:text-blue-700 text-2xl mt-1"
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
