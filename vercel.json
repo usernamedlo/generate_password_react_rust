@@ -1,0 +1,12 @@
+{
+    "version": 2,
+    "builds": [
+      { "src": "frontend/package.json", "use": "@vercel/node" },
+      { "src": "backend/Cargo.toml", "use": "@vercel/rust" }
+    ],
+    "routes": [
+      { "src": "/backend/(.*)", "dest": "/backend/$1" },
+      { "src": "/(.*)", "dest": "/frontend/$1" }
+    ]
+  }
+  

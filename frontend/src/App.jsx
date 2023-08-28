@@ -9,7 +9,7 @@ function App() {
   const [numPasswords, setNumPasswords] = useState(1);
 
   const fetchPassword = () => {
-    let url = `http://localhost:8000/api/password/${length}?`;
+    let url = `http://192.168.1.129:8000/api/password/${length}?`;
 
     if (includeUppercase) {
       url += "includeUppercase=true&";
